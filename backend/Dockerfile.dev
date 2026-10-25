@@ -1,0 +1,18 @@
+FROM php:8.4-cli
+
+# Instala programas do sistema (Linux) e extensões do PHP:
+RUN apt-get update && apt-get install -y git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql zip bcmath \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Copia o Composer (gerenciador de pacotes do PHP) de dentro da imagem oficial dele.
+# Assim a gente não precisa instalar o Composer manualmente.
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Define a pasta de trabalho dentro do container.
+# Os comandos seguintes (e o CMD) rodam a partir dela.
+WORKDIR /var/www/html
+EXPOSE 8000
+
+CMD ["sh", "-c", "composer install && php artisan serve --host=0.0.0.0 --port=8000"]
