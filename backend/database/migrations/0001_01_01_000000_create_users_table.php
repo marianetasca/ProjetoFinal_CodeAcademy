@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Papel do usuário: 'customer' (cliente) ou 'admin'.
+            // O padrão é customer, então todo registro novo nasce cliente.
+            $table->string('role')->default('customer');
+
             $table->rememberToken();
             $table->timestamps();
         });
