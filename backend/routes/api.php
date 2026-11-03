@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Todas começam com /api/auth (o /api vem do Laravel, o /auth vem do prefix).
@@ -15,4 +16,14 @@ Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
+});
+
+// Público: qualquer pessoa vê as categorias
+Route::get('categories', [CategoryController::class, 'index']);
+
+// Admin: precisa de token válido (auth:sanctum) E do papel admin (admin)
+Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('categories', [CategoryController::class, 'store']);
+    Route::put('categories/{category}', [CategoryController::class, 'update'])->whereNumber('category');
+    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->whereNumber('category');
 });

@@ -19,22 +19,17 @@ class AuthController extends Controller
     // POST /api/auth/register
     public function register(RegisterRequest $request)
     {
-        $result = $this->authService->register($request->validated());
+        $user = $this->authService->register($request->validated(), $request);
 
-        // additional() acrescenta o token ao lado do "data" do usuário.
-        return (new UserResource($result['user']))
-            ->additional(['token' => $result['token']])
-            ->response()
-            ->setStatusCode(201);
+        return (new UserResource($user))->response()->setStatusCode(201);
     }
 
     // POST /api/auth/login
     public function login(LoginRequest $request)
     {
-        $result = $this->authService->login($request->validated());
+        $user = $this->authService->login($request->validated(), $request);
 
-        return (new UserResource($result['user']))
-            ->additional(['token' => $result['token']]);
+        return new UserResource($user);
     }
 
     // GET /api/auth/me  -> devolve o usuário dono do token

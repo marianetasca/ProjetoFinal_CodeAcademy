@@ -4,44 +4,42 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    // Cria o usuário e já devolve um token de acesso.
-    public function register(array $data): array
+    // Cria o usuário e já o deixa logado (grava na sessão).
+    public function register(array $data, Request $request): User
     {
-        $user = User::create($data);   // a senha é criptografada pelo cast 'hashed' do Model
+        $user = User::create($data);
 
-        return [
-            'user'  => $user,
-            'token' => $user->createToken('api')->plainTextToken,
-        ];
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate();   // gera um id de sessão novo (evita fixação de sessão)
+
+        return $user;
     }
 
-    // Confere e-mail e senha. Se estiverem certos, devolve o usuário e um token.
-    public function login(array $credentials): array
+    // Confere e-mail e senha. Se estiverem certos, abre a sessão.
+    public function login(array $credentials, Request $request): User
     {
-        $user = User::where('email', $credentials['email'])->first();
-
-        // A mensagem é a mesma para e-mail inexistente e senha errada,
-        // assim ninguém descobre quais e-mails estão cadastrados.
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        if (! Auth::guard('web')->attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['E-mail ou senha inválidos.'],
             ]);
         }
 
-        return [
-            'user'  => $user,
-            'token' => $user->createToken('api')->plainTextToken,
-        ];
+        $request->session()->regenerate();
+
+        return Auth::guard('web')->user();
     }
 
-    // Apaga o token usado nesta requisição. Depois disso ele deixa de valer.
+    // Encerra a sessão: o cookie antigo deixa de valer.
     public function logout(Request $request): void
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
     }
 }
