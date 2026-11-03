@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+
+            // Carrinho de usuário logado: user_id preenchido.
+            // unique() garante no máximo UM carrinho por usuário.
+            // nullOnDelete não se aplica aqui; se o usuário for apagado, o carrinho vai junto.
+            $table->foreignId('user_id')->nullable()->unique()->constrained()->cascadeOnDelete();
+
+            // Carrinho de visitante: user_id nulo e token preenchido.
+            // O token é gerado pelo servidor (aleatório) e guardado pelo frontend.
+            $table->string('token', 64)->nullable()->unique();
+
             $table->timestamps();
         });
     }

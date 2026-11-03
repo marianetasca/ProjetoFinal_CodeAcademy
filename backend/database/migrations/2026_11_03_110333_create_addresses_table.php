@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('street');
+            $table->string('number');
+            $table->string('complement')->nullable();
+            $table->string('district');
+            $table->string('city');
+            $table->string('state', 2);       // sigla do estado (PR, SP...)
+            $table->string('zip_code', 9);    // CEP
             $table->timestamps();
         });
     }

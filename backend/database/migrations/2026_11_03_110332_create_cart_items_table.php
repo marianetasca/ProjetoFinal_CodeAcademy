@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('cart_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cart_id')->constrained()->cascadeOnDelete();  // apagou o carrinho, apaga os itens
+            $table->foreignId('product_id')->constrained();
+            $table->unsignedInteger('quantity')->default(1);
             $table->timestamps();
+
+            // Regra obrigatória: o mesmo produto não pode aparecer duas vezes no mesmo carrinho.
+            // Adicionar de novo deve SOMAR a quantidade na linha existente.
+            $table->unique(['cart_id', 'product_id']);
         });
     }
 

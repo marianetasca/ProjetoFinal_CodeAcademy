@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+
+            // unique() faz a relação ser 1:1: cada pedido tem no máximo um pagamento.
+            $table->foreignId('order_id')->unique()->constrained()->cascadeOnDelete();
+
+            $table->unsignedInteger('amount_cents');
+            $table->string('status');                    // ex.: 'paid'
+            $table->timestamp('paid_at')->nullable();    // data e hora do pagamento simulado
             $table->timestamps();
         });
     }
