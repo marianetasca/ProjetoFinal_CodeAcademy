@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProductController;
 
 // Todas começam com /api/auth (o /api vem do Laravel, o /auth vem do prefix).
 Route::prefix('auth')->group(function () {
@@ -26,4 +27,14 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::post('categories', [CategoryController::class, 'store']);
     Route::put('categories/{category}', [CategoryController::class, 'update'])->whereNumber('category');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->whereNumber('category');
+
+    Route::get('products', [ProductController::class, 'adminIndex']);
+    Route::post('products', [ProductController::class, 'store']);
+    Route::put('products/{product}', [ProductController::class, 'update'])->whereNumber('product');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->whereNumber('product');
 });
+
+
+// Públicas
+Route::get('products', [ProductController::class, 'index']);
+Route::get('products/{product}', [ProductController::class, 'show'])->whereNumber('product');
