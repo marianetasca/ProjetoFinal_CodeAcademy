@@ -33,6 +33,9 @@ class OrderResource extends JsonResource
             ],
             // Só aparece quando os itens foram carregados (detalhe do pedido)
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
+
+            // Só aparece quando o usuário foi carregado (lista do admin)
+            'user' => new UserResource($this->whenLoaded('user')),
         ];
     }
 }

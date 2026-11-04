@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\Payment;
 
 class OrderService
 {
@@ -121,5 +122,93 @@ class OrderService
         }
 
         return $order;
+    }
+
+    // Pagamento simulado: só o DONO pode pagar.
+    public function pay(User $user, int $id): Order
+    {
+        return DB::transaction(function () use ($user, $id) {
+            // lockForUpdate: se a pessoa clicar duas vezes, o segundo clique espera o primeiro terminar
+            $order = Order::with('items')->lockForUpdate()->findOrFail($id);
+
+            if ($order->user_id !== $user->id) {
+                abort(403, 'Somente o dono do pedido pode pagá-lo.');
+            }
+
+            // Só pode pagar quem está aguardando pagamento (usa a regra do enum)
+            if (! $order->status->canTransitionTo(OrderStatus::Paid)) {
+                abort(409, 'Este pedido não está aguardando pagamento.');
+            }
+
+            // Registro do pagamento simulado (sem nenhum dado de cartão)
+            Payment::create([
+                'order_id'     => $order->id,
+                'amount_cents' => $order->total_cents,
+                'status'       => 'paid',
+                'paid_at'      => now(),
+            ]);
+
+            $order->update([
+                'status'  => OrderStatus::Paid,
+                'paid_at' => now(),
+            ]);
+
+            return $order;
+        });
+    }
+
+    // Cancelamento: dono ou admin. Devolve o estoque.
+    public function cancel(User $user, int $id): Order
+    {
+        return DB::transaction(function () use ($user, $id) {
+            $order = Order::with('items')->lockForUpdate()->findOrFail($id);
+
+            if ($order->user_id !== $user->id && ! $user->isAdmin()) {
+                abort(403, 'Você não tem permissão para cancelar este pedido.');
+            }
+
+            // Só pedido aguardando pagamento pode ser cancelado
+            if (! $order->status->canTransitionTo(OrderStatus::Cancelled)) {
+                abort(409, 'Somente pedidos aguardando pagamento podem ser cancelados.');
+            }
+
+            // Devolve a quantidade de cada item ao estoque.
+            // withTrashed(): mesmo que o produto tenha sido "apagado" (soft delete), o estoque volta.
+            foreach ($order->items as $item) {
+                Product::withTrashed()
+                    ->where('id', $item->product_id)
+                    ->increment('stock', $item->quantity);
+            }
+
+            $order->update(['status' => OrderStatus::Cancelled]);
+
+            return $order;
+        });
+    }
+
+    // ----- Admin -----
+
+    // Todos os pedidos da loja, com filtro opcional por status
+    public function listAll(?string $status): LengthAwarePaginator
+    {
+        return Order::with('user')
+            ->when($status, fn($query) => $query->where('status', $status))
+            ->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString();
+    }
+
+    // Avança o status respeitando as transições válidas
+    public function updateStatus(int $id, OrderStatus $next): Order
+    {
+        $order = Order::findOrFail($id);
+
+        if (! $order->status->canTransitionTo($next)) {
+            abort(409, "Transição inválida: {$order->status->value} → {$next->value}.");
+        }
+
+        $order->update(['status' => $next]);
+
+        return $order->load('items', 'user');
     }
 }

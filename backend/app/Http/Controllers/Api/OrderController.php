@@ -33,4 +33,16 @@ class OrderController extends Controller
     {
         return new OrderResource($this->orderService->find($request->user(), $id));
     }
+
+    // POST /api/orders/{id}/pay
+    public function pay(Request $request, int $id)
+    {
+        return new OrderResource($this->orderService->pay($request->user(), $id));
+    }
+
+    // POST /api/orders/{id}/cancel
+    public function cancel(Request $request, int $id)
+    {
+        return new OrderResource($this->orderService->cancel($request->user(), $id));
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use Illuminate\Support\Facades\Route;
 
 // O Laravel coloca /api na frente de todas as rotas deste arquivo.
@@ -45,6 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);
     Route::get('orders/{order}', [OrderController::class, 'show'])->whereNumber('order');
+
+    Route::post('orders/{order}/pay', [OrderController::class, 'pay'])->whereNumber('order');
+    Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->whereNumber('order');
 });
 
 // ---------- Admin (/api/admin/...): sessão ativa E papel admin ----------
@@ -58,4 +62,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::post('products', [ProductController::class, 'store']);
     Route::put('products/{product}', [ProductController::class, 'update'])->whereNumber('product');
     Route::delete('products/{product}', [ProductController::class, 'destroy'])->whereNumber('product');
+
+    Route::get('orders', [AdminOrderController::class, 'index']);
+    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->whereNumber('order');
 });
