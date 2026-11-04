@@ -20,4 +20,21 @@ class CartItem extends Model
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
+
+    // Disponível = produto não apagado, ativo e com estoque suficiente para a quantidade
+    public function isAvailable(): bool
+    {
+        $product = $this->product;
+
+        return $product
+            && ! $product->trashed()
+            && $product->active
+            && $product->stock >= $this->quantity;
+    }
+
+    // Preço ATUAL do produto x quantidade (o carrinho não congela preço; só o pedido congela)
+    public function subtotalCents(): int
+    {
+        return $this->product->price_cents * $this->quantity;
+    }
 }

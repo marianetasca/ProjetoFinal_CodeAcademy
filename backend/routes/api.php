@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CartController;
 
 // Todas começam com /api/auth (o /api vem do Laravel, o /auth vem do prefix).
 Route::prefix('auth')->group(function () {
@@ -38,3 +39,9 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
 // Públicas
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{product}', [ProductController::class, 'show'])->whereNumber('product');
+
+// Carrinho: público, vale para visitante e para usuário logado
+Route::get('cart', [CartController::class, 'show']);
+Route::post('cart/items', [CartController::class, 'addItem']);
+Route::patch('cart/items/{item}', [CartController::class, 'updateItem'])->whereNumber('item');
+Route::delete('cart/items/{item}', [CartController::class, 'removeItem'])->whereNumber('item');

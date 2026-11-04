@@ -9,20 +9,30 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    // Cria o usuário e já o deixa logado (grava na sessão).
-    public function register(array $data, Request $request): User
+    // O Laravel entrega o CartService pronto (injeção de dependência)
+    public function __construct(
+        private CartService $cartService
+    ) {}
+
+    public function register(array $data, Request $request): array
     {
+        // 1) Guarda o id da sessão ANTES de logar: é ele que identifica o carrinho de visitante
+        $oldSessionId = $request->session()->getId();
+
         $user = User::create($data);
-
         Auth::guard('web')->login($user);
-        $request->session()->regenerate();   // gera um id de sessão novo (evita fixação de sessão)
+        $request->session()->regenerate();
 
-        return $user;
+        // 2) Funde o carrinho do visitante no da conta
+        $warnings = $this->cartService->mergeGuestCart($oldSessionId, $user);
+
+        return ['user' => $user, 'cart_warnings' => $warnings];
     }
 
-    // Confere e-mail e senha. Se estiverem certos, abre a sessão.
-    public function login(array $credentials, Request $request): User
+    public function login(array $credentials, Request $request): array
     {
+        $oldSessionId = $request->session()->getId();   // antes do attempt, que troca o id
+
         if (! Auth::guard('web')->attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['E-mail ou senha inválidos.'],
@@ -31,10 +41,12 @@ class AuthService
 
         $request->session()->regenerate();
 
-        return Auth::guard('web')->user();
+        $user = Auth::guard('web')->user();
+        $warnings = $this->cartService->mergeGuestCart($oldSessionId, $user);
+
+        return ['user' => $user, 'cart_warnings' => $warnings];
     }
 
-    // Encerra a sessão: o cookie antigo deixa de valer.
     public function logout(Request $request): void
     {
         Auth::guard('web')->logout();

@@ -8,14 +8,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cart extends Model
 {
-    protected $fillable = ['user_id', 'token'];
+    // Visitante: user_id nulo e session_id preenchido. Usuário logado: o contrário.
+    protected $fillable = ['user_id', 'session_id'];
 
-    public function user(): BelongsTo
+    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function items(): HasMany  { return $this->hasMany(CartItem::class); }
+
+    // Quantidade total de unidades (é o número que aparece no ícone do carrinho)
+    public function itemsCount(): int
     {
-        return $this->belongsTo(User::class);
+        return (int) $this->items->sum('quantity');
     }
-    public function items(): HasMany
+
+    // Total em centavos, calculado aqui no servidor.
+    // Itens indisponíveis ficam de fora, para não cobrar algo que não dá para comprar.
+    public function totalCents(): int
     {
-        return $this->hasMany(CartItem::class);
+        return (int) $this->items
+            ->filter(fn ($item) => $item->isAvailable())
+            ->sum(fn ($item) => $item->subtotalCents());
     }
 }
