@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel: Produtos | Loja de Plantas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header id="cabecalho"></header>
+
+  <main class="container">
+    <h1>Painel do administrador</h1>
+    <nav id="subnav" class="subnav"></nav>
+    <p id="mensagem" class="mensagem erro" role="alert"></p>
+
+    <!-- Só aparece para admin (o admin-comum.js libera) -->
+    <div id="conteudo-admin" hidden>
+      <h2>Produtos</h2>
+
+      <form id="form-busca" class="filtros" method="get" action="/admin/index.html">
+        <input type="search" id="busca" name="search" placeholder="Buscar produto por nome">
+        <button type="submit">Buscar</button>
+      </form>
+
+      <div id="lista" class="tabela-rolavel"></div>
+      <nav id="paginacao" class="paginacao"></nav>
+
+      <section class="bloco">
+        <h3 id="titulo-form">Novo produto</h3>
+        <form id="form-produto" class="form-admin">
+          <label>Categoria
+            <select name="category_id" required><option value="">Escolha...</option></select>
+          </label>
+          <label>Nome <input name="name" maxlength="255" required></label>
+          <label>Preço (R$) <input type="number" name="preco" step="0.01" min="0.01" placeholder="39.90" required></label>
+          <label>Estoque <input type="number" name="stock" min="0" step="1" value="0" required></label>
+          <label class="largura-total">Descrição <textarea name="description" rows="3"></textarea></label>
+          <label class="largura-total">Imagem (jpg, png ou webp, até 2 MB)
+            <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+            <small id="dica-imagem"></small>
+          </label>
+          <label class="check"><input type="checkbox" name="active" checked> Produto ativo (aparece no catálogo)</label>
+          <button type="submit">Salvar produto</button>
+          <button type="button" id="btn-cancelar" class="btn-remover" hidden>Cancelar edição</button>
+        </form>
+        <p id="msg-form" class="aviso" role="status"></p>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="/js/admin-produtos.js"></script>
+</body>
+</html>

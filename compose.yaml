@@ -1,5 +1,4 @@
 services:
-
   # Banco de dados
   db:
     image: mysql:8.4
@@ -9,7 +8,7 @@ services:
       MYSQL_PASSWORD: loja
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
     volumes:
-      - db_data:/var/lib/mysql        # os dados sobrevivem se o container for recriado
+      - db_data:/var/lib/mysql # os dados sobrevivem se o container for recriado
     healthcheck:
       # --protocol=tcp evita marcar como "saudável" durante a inicialização do MySQL
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp"]
@@ -23,7 +22,7 @@ services:
       dockerfile: Dockerfile.dev
     env_file: ./backend/.env
     expose:
-      - "8000"                        # só os outros containers enxergam; o navegador não
+      - "8000" # só os outros containers enxergam; o navegador não
     volumes:
       - ./backend:/var/www/html
     depends_on:
@@ -31,7 +30,13 @@ services:
         condition: service_healthy
     healthcheck:
       # O proxy só inicia quando a rota /up da API responder
-      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);"]
+      test:
+        [
+          "CMD",
+          "php",
+          "-r",
+          "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);",
+        ]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -42,8 +47,23 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    environment:
+      API_URL: /api # endereço da API que o navegador usa
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro # espelha a pasta (somente leitura)
     expose:
       - "80"
+
+  # Documentação interativa da API (Swagger UI)
+  swagger:
+    image: swaggerapi/swagger-ui
+    environment:
+      BASE_URL: /docs # a documentação fica em /docs
+      SWAGGER_JSON: /spec/openapi.yaml # qual arquivo ela vai ler
+    volumes:
+      - ./docs:/spec:ro # espelha a pasta docs (somente leitura)
+    expose:
+      - "8080" # só o proxy enxerga
 
   # Proxy: a única porta aberta para o navegador
   proxy:
@@ -57,6 +77,8 @@ services:
         condition: service_healthy
       frontend:
         condition: service_started
+      swagger:
+        condition: service_started # <- novo
 
 volumes:
   db_data:

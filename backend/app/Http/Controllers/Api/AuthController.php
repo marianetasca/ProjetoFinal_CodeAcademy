@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
+use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -48,5 +49,11 @@ class AuthController extends Controller
         $this->authService->logout($request);
 
         return response()->noContent();   // 204: deu certo, sem conteúdo para devolver
+    }
+
+    // PUT /api/auth/me
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        return new UserResource($this->authService->updateProfile($request->user(), $request->validated()));
     }
 }

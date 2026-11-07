@@ -1,10 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Loja</title>
-  </head>
-  <body>
-    <h1>Frontend funcionando</h1>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo | Loja de Plantas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- O menu é montado pelo layout.js -->
+  <header id="cabecalho"></header>
+
+  <main class="container">
+    <h1>Catálogo</h1>
+
+    <!-- method="get": o próprio navegador monta a URL com os filtros, sem JavaScript -->
+    <form class="filtros" method="get" action="/index.html">
+      <input type="search" id="busca" name="search" placeholder="Buscar por nome" maxlength="100">
+
+      <select id="categoria" name="category_id" aria-label="Categoria">
+        <option value="">Todas as categorias</option>
+      </select>
+
+      <select id="ordem" name="sort" aria-label="Ordenar por">
+        <option value="latest">Mais recentes</option>
+        <option value="price_asc">Menor preço</option>
+        <option value="price_desc">Maior preço</option>
+      </select>
+
+      <button type="submit">Buscar</button>
+    </form>
+
+    <p id="mensagem" class="mensagem"></p>
+    <section id="lista" class="grade"></section>
+    <nav id="paginacao" class="paginacao"></nav>
+  </main>
+
+  <script type="module" src="/js/catalogo.js"></script>
+</body>
 </html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfil | Loja de Plantas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header id="cabecalho"></header>
+
+  <main class="container">
+    <h1>Perfil</h1>
+
+    <section class="bloco">
+      <h2>Meus dados</h2>
+      <form id="form-dados" class="form-dados">
+        <label>Nome <input name="name" maxlength="255" required></label>
+        <label>E-mail <input type="email" name="email" maxlength="255" required></label>
+        <button type="submit">Salvar dados</button>
+      </form>
+      <p id="msg-dados" class="aviso" role="status"></p>
+    </section>
+
+    <section class="bloco">
+      <h2>Meus endereços</h2>
+      <div id="lista-enderecos"></div>
+
+      <h3 id="titulo-endereco">Novo endereço</h3>
+      <form id="form-endereco" class="form-endereco">
+        <label>Rua <input name="street" maxlength="255" required></label>
+        <label>Número <input name="number" maxlength="20" required></label>
+        <label>Complemento <input name="complement" maxlength="255"></label>
+        <label>Bairro <input name="district" maxlength="255" required></label>
+        <label>Cidade <input name="city" maxlength="255" required></label>
+        <label>Estado (sigla) <input name="state" maxlength="2" minlength="2" placeholder="PR" required></label>
+        <label>CEP <input name="zip_code" maxlength="9" placeholder="85010-000" required></label>
+        <button type="submit" id="btn-salvar-endereco">Salvar endereço</button>
+        <button type="button" id="btn-cancelar-edicao" class="btn-remover" hidden>Cancelar edição</button>
+      </form>
+      <p id="msg-endereco" class="aviso" role="status"></p>
+    </section>
+  </main>
+
+  <script type="module" src="/js/perfil.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel: Categorias | Loja de Plantas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header id="cabecalho"></header>
+
+  <main class="container">
+    <h1>Painel do administrador</h1>
+    <nav id="subnav" class="subnav"></nav>
+    <p id="mensagem" class="mensagem erro" role="alert"></p>
+
+    <div id="conteudo-admin" hidden>
+      <h2>Categorias</h2>
+      <div id="lista" class="tabela-rolavel"></div>
+
+      <section class="bloco">
+        <h3 id="titulo-form">Nova categoria</h3>
+        <form id="form-categoria" class="form-linha">
+          <input name="name" maxlength="255" placeholder="Nome da categoria" required>
+          <button type="submit">Salvar</button>
+          <button type="button" id="btn-cancelar" class="btn-remover" hidden>Cancelar edição</button>
+        </form>
+        <p id="msg-form" class="aviso" role="status"></p>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="/js/admin-categorias.js"></script>
+</body>
+</html>

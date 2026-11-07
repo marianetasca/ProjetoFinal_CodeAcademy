@@ -1,0 +1,22 @@
+# Configuração do Nginx do container do frontend.
+# A imagem do Nginx troca ${API_URL} pelo valor da variável de ambiente ao iniciar.
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # O JavaScript lê o endereço da API daqui (ver js/api.js).
+    # Assim a URL muda só com a variável de ambiente, sem editar nenhum arquivo.
+    location = /config.js {
+        default_type application/javascript;
+        add_header Cache-Control "no-store";
+        return 200 "export const API_URL = '${API_URL}';";
+    }
+
+    # Entrega o arquivo pedido. Se não existir, vai para a página 404.
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel: Pedidos | Loja de Plantas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header id="cabecalho"></header>
+
+  <main class="container">
+    <h1>Painel do administrador</h1>
+    <nav id="subnav" class="subnav"></nav>
+    <p id="mensagem" class="mensagem erro" role="alert"></p>
+
+    <div id="conteudo-admin" hidden>
+      <h2>Pedidos da loja</h2>
+
+      <form class="filtros" method="get" action="/admin/pedidos.html">
+        <select id="filtro-status" name="status" aria-label="Filtrar por status">
+          <option value="">Todos os status</option>
+          <option value="pending">Aguardando pagamento</option>
+          <option value="paid">Pago</option>
+          <option value="shipped">Enviado</option>
+          <option value="delivered">Entregue</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+        <button type="submit">Filtrar</button>
+      </form>
+
+      <div id="lista" class="tabela-rolavel"></div>
+      <nav id="paginacao" class="paginacao"></nav>
+    </div>
+  </main>
+
+  <script type="module" src="/js/admin-pedidos.js"></script>
+</body>
+</html>

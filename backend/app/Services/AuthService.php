@@ -54,4 +54,12 @@ class AuthService
         $request->session()->invalidate();
         $request->session()->regenerateToken();
     }
+
+    // Atualiza nome e e-mail. O papel (role) nunca passa por aqui.
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update($data);
+
+        return $user;
+    }
 }

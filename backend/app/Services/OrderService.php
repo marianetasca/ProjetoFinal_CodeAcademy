@@ -15,8 +15,14 @@ use App\Models\Payment;
 class OrderService
 {
     // Regra de frete (documentada no README): fixo, e grátis a partir de um valor.
-    private const SHIPPING_CENTS = 1500;             // R$ 15,00
-    private const FREE_SHIPPING_FROM_CENTS = 20000;  // R$ 200,00
+    public const SHIPPING_CENTS = 1500;             // R$ 15,00
+    public const FREE_SHIPPING_FROM_CENTS = 20000;  // R$ 200,00
+
+    // A regra do frete fica só aqui: o carrinho usa para MOSTRAR e o pedido usa para COBRAR.
+    public static function shippingFor(int $subtotalCents): int
+    {
+        return $subtotalCents >= self::FREE_SHIPPING_FROM_CENTS ? 0 : self::SHIPPING_CENTS;
+    }
 
     // Cria o pedido a partir do carrinho do usuário.
     public function create(User $user, int $addressId): Order
@@ -65,7 +71,7 @@ class OrderService
                 throw ValidationException::withMessages(['items' => $errors]);
             }
 
-            $shipping = $subtotal >= self::FREE_SHIPPING_FROM_CENTS ? 0 : self::SHIPPING_CENTS;
+            $shipping = self::shippingFor($subtotal);
 
             // 2ª passada: agora grava
             $order = Order::create([

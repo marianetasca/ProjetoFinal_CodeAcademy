@@ -16,6 +16,7 @@ class OrderResource extends JsonResource
     {
         return [
             'id'             => $this->id,
+            'user_id'        => $this->user_id,
             'status'         => $this->status->value,   // pending, paid, shipped, delivered, cancelled
             'subtotal_cents' => $this->subtotal_cents,
             'shipping_cents' => $this->shipping_cents,
