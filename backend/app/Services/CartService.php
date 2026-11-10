@@ -111,7 +111,7 @@ class CartService
             foreach ($guestCart->items()->with('product')->get() as $guestItem) {
                 $product = $guestItem->product;
 
-                // Produto indisponível não pode entrar no carrinho (regra do carrinho)
+                // Produto indisponível não pode entrar no carrinho
                 if (! $product || $product->trashed() || ! $product->active || $product->stock < 1) {
                     $name = $product?->name ?? 'Um produto';
                     $warnings[] = "{$name} está indisponível e não foi adicionado ao carrinho.";
@@ -121,7 +121,7 @@ class CartService
                 // Esse produto já está no carrinho da conta?
                 $userItem = $userCart->items()->where('product_id', $product->id)->first();
 
-                // Regra: soma as quantidades
+                // Regra: soma as quantidades(regra do carrinho)
                 $total = ($userItem ? $userItem->quantity : 0) + $guestItem->quantity;
 
                 // Regra: limita ao estoque e avisa

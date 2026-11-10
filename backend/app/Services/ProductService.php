@@ -13,7 +13,7 @@ class ProductService
     // $includeInactive = true só é usado pelo painel do admin.
     public function list(array $filters, bool $includeInactive = false): LengthAwarePaginator
     {
-        $query = Product::with('category');
+        $query = Product::with('category');//eager loading
 
         if (! $includeInactive) {
             $query->active();   // produtos inativos não aparecem no catálogo
@@ -34,7 +34,7 @@ class ProductService
         };
 
         // 12 por página. withQueryString() mantém search/sort nos links das páginas.
-        return $query->paginate(12)->withQueryString();
+        return $query->paginate(12)->withQueryString();///para nao perder o filtro quando for feita a busca
     }
 
     // Detalhe público: produto inativo ou inexistente dá 404 (findOrFail).

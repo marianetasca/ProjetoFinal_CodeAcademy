@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
@@ -50,7 +52,7 @@ class ProductSeeder extends Seeder
             'Adubos' => [
                 ['Húmus de minhoca 1kg', 1590, 35],
                 ['Adubo NPK 500g', 1990, 28],
-                ['Farinha de osso 500g', 1790, 20],
+                ['Farinha de osso 1kg', 1790, 20],
                 ['Terra vegetal 5kg', 2290, 40],
                 ['Fertilizante líquido', 1290, 26],
             ],
@@ -60,12 +62,29 @@ class ProductSeeder extends Seeder
             $categoriaId = Category::where('name', $categoria)->value('id');
 
             foreach ($produtos as [$nome, $preco, $estoque]) {
+
+                $caminho = null;
+
+                // Procura a imagem com o nome do produto em slug (ex.: "jiboia.jpg" ou "jiboia.jpeg")
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $extensao) {
+                    $arquivo = database_path('seeders/images/' . Str::slug($nome) . '.' . $extensao);
+
+                    if (file_exists($arquivo)) {
+                        $caminho = 'products/' . basename($arquivo);
+                        // Copia para o storage público, o mesmo lugar dos uploads do painel
+                        Storage::disk('public')->put($caminho, file_get_contents($arquivo));
+                        break;   // achou, não precisa testar as outras extensões
+                        //O método put() grava o conteúdo recebido no destino indicado.
+                    }
+                }
+
                 Product::create([
                     'category_id' => $categoriaId,
                     'name'        => $nome,
                     'description' => "Descrição de exemplo: {$nome}.",
                     'price_cents' => $preco,
                     'stock'       => $estoque,
+                    'image_path'  => $caminho,
                 ]);
             }
         }
