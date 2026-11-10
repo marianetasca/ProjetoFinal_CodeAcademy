@@ -39,8 +39,8 @@ services:
         ]
       interval: 5s
       timeout: 3s
-      retries: 20
-      start_period: 30s
+      retries: 40
+      start_period: 90s
 
   # Frontend (HTML, CSS e JS servidos pelo Nginx)
   frontend:
